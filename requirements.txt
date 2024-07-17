@@ -1,0 +1,11 @@
+numpy
+scipy
+sklearn
+pandas
+numba
+zmq
+sys
+time
+argparse
+gibbs
+sys
