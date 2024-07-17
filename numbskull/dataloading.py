@@ -16,13 +16,12 @@ import numpy as np
 #
 # ===----------------------------------------------------------------------===//
 
-"""TODO: Add a description of the purpose of this module."""
 
 
 
 # HELPER METHODS #
 def dataType(i):
-    """TODO: Add a description of the dataType function."""
+    """TODO: """
     return {0: "Boolean",
             1: "Categorical"}.get(i, "Unknown")
 
@@ -30,7 +29,7 @@ def dataType(i):
 @jit(nopython=True, cache=True)
 def compute_var_map(variables, factors, fmap, vmap, factor_index, domain_mask,
                     factors_to_skip=np.empty(0, np.int64)):
-    """TODO: Add a description of the compute_var_map function."""
+    """TODO: """
     # Fill in domain values (for mapping when dumping marginals)
     for i, v in enumerate(variables):
         # skip boolean (value is 0)
@@ -97,7 +96,7 @@ def compute_var_map(variables, factors, fmap, vmap, factor_index, domain_mask,
 
 @jit(nopython=True, cache=True)
 def reverse(data, start, end):
-    """TODO: Add a description of the reverse function."""
+    """TODO: """
     end -= 1
     while (start < end):
         data[start], data[end] = data[end], data[start]
@@ -116,7 +115,7 @@ def reverse_array(data):
 # DEFINE NUMBA-BASED DATA LOADING METHODS #
 @jit(nopython=True, cache=True)
 def load_weights(data, nweights, weights):
-    """TODO: Add a description of the load_weights function."""
+    """TODO: """
     for i in range(nweights):
         # TODO: read types from struct?
         # TODO: byteswap only if system is little-endian
@@ -139,7 +138,7 @@ def load_weights(data, nweights, weights):
 
 @jit(nopython=True, cache=True)
 def load_variables(data, nvariables, variables):
-    """TODO: Add a description of the load_variables function."""
+    """TODO: """
     for i in range(nvariables):
         # TODO: read types from struct?
         # TODO: byteswap only if system is little-endian
@@ -172,7 +171,7 @@ def load_variables(data, nvariables, variables):
 
 @jit(nopython=True, cache=True)
 def load_domains(data, domain_mask, vmap, variables):
-    """TODO: Add a description of the load_domains function."""
+    """TODO: """
     index = 0
     while index < data.size:
         buf = data[index: index + 8]
@@ -203,7 +202,7 @@ def load_domains(data, domain_mask, vmap, variables):
 
 @jit(nopython=True, cache=True)
 def load_factors(data, nfactors, factors, fmap, domain_mask, variable, vmap):
-    """TODO: Add a description of the load_factors function."""
+    """TODO: """
     index = 0
     fmap_idx = 0
     k = 0  # somehow numba 0.28 would raise LowerError without this line

@@ -40,7 +40,7 @@ def recv_array(socket, flags=0, copy=True, track=False):
     """Receive a numpy array over a socket."""
     md = socket.recv_json(flags=flags)
     msg = socket.recv(flags=flags, copy=copy, track=track)
-    buf = buffer(msg)
+    buf = memoryview(msg)
 
     try:
         A = np.frombuffer(buf, dtype=md['dtype'])
