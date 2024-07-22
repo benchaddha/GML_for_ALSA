@@ -27,13 +27,13 @@ Meta = np.dtype([('weights', np.int64),
                  ('factors', np.int64),
                  ('edges', np.int64)])
 
-Weight = np.dtype([("isFixed", np.bool),
-                   ("parameterize",np.bool),       # Flag: whether the weight needs to be parameterized, the number of parameters needed for parameterization will be added later
+Weight = np.dtype([("isFixed", np.bool_),
+                   ("parameterize",np.bool_),       # Flag: whether the weight needs to be parameterized, the number of parameters needed for parameterization will be added later
                    ("initialValue", np.float64),
                    ("a", np.float64),   # Tau
                    ("b", np.float64)])  # Alpha
 
-Variable = np.dtype([("isEvidence", np.int8),
+Variable = np.dtype([("isEvidence", np.bool_),   # Changing from np.int8 to np.bool_
                      ("initialValue", np.int64),
                      ("dataType", np.int16),
                      ("cardinality", np.int64),

@@ -213,7 +213,7 @@ class NumbSkull(object):
         assert(type(factor) == np.ndarray and factor.dtype == Factor)
         assert(type(fmap) == np.ndarray and fmap.dtype == FactorToVar)
         assert(type(domain_mask) == np.ndarray and
-               domain_mask.dtype == np.bool)
+               domain_mask.dtype == np.bool_)
         assert(type(edges) == int or
                type(edges) == long or
                type(edges) == np.int64)
@@ -333,7 +333,7 @@ class NumbSkull(object):
 
         # load domains
         # whether a var has domain spec
-        domain_mask = np.zeros(meta["variables"], np.bool)
+        domain_mask = np.zeros(meta["variables"], np.bool_)
         domain_file = directory + "/" + domainfile
         if os.path.isfile(domain_file) and os.stat(domain_file).st_size > 0:
             domain_data = np.memmap(directory + "/" + domainfile, mode="c")

@@ -195,7 +195,7 @@ class GML:
         edges_num = len(connected_feature_set) + len(partial_edges)  # Number of edges
         factor = np.zeros(edges_num, Factor)  # Currently treating all as single factors, so there are as many factors as there are edges
         fmap = np.zeros(edges_num, FactorToVar)
-        domain_mask = np.zeros(var_num, np.bool)
+        domain_mask = np.zeros(var_num, np.bool_)
         edges = list()
         edge = namedtuple('edge', ['index', 'factorId', 'varId'])  # Edge for single variable factor
         factor_index = 0
@@ -280,6 +280,8 @@ class GML:
         :param var_id_list: List of k variable IDs.
         :return: Variable ID that was labeled.
         '''
+        if not var_id_list:
+            raise ValueError("var_id_list is empty, cannot label an empty list.")
         entropy_list = list()
         if len(var_id_list) > 1:  # If the number of variables passed in is greater than 1, label the one with the smallest entropy each time
             for var_id in var_id_list:
@@ -313,12 +315,15 @@ class GML:
         var = 0  # Variable ID labeled each round
         update_feature_set = set()       # Store features whose evidential support has changed during one round of updates
         inferenced_variables_id = set()  # Hidden variables that have been inferred and constructed subgraphs during one round of updates
+        
         for feature in self.features:
             update_feature_set.add(feature['feature_id'])
+        
         self.evidential_support(update_feature_set)
         update_feature_set.clear()
         self.approximate_probability_estimation(self.poential_variables_set)
         logging.info("approximate_probability calculate finished")
+        
         while len(self.poential_variables_set) > 0:
             # When the number of labeled variables reaches update_cache, re-regress and calculate evidential support
             if labeled_var == update_cache:
@@ -333,22 +338,37 @@ class GML:
                 update_feature_set.clear()
                 self.labeled_variables_set.clear()
                 inferenced_variables_id.clear()
-            if len(self.poential_variables_set) >= self.top_m:  # If the number of hidden variables is less than topm, there is no need to select topm, and the labeled variables need to be removed from topm in real time
+            # If the number of hidden variables is less than topm, there is no need to select topm, and the labeled variables need to be removed from topm in real time
+            if len(self.poential_variables_set) >= self.top_m:  
                 m_list = self.select_top_m_by_es(self.top_m)
             else:
+                m_list = list(self.poential_variables_set)
+            
+            if var in m_list:
                 m_list.remove(var)
+
+            if not m_list:
+                logging.warning("m_list is empty, no hidden variables to label")
+                continue
+
             if len(self.poential_variables_set) >= self.top_k:  # If the number of hidden variables is less than topk, there is no need to select topk, and the labeled variables need to be removed from topk in real time
                 k_list = self.select_top_k_by_entropy(m_list, self.top_k)
             else:
+                k_list = list(self.poential_variables_set)
+
+            if var in k_list:
                 k_list.remove(var)
+
+            if not k_list:
+                logging.warning("k_list is empty, no hidden variables to label")
+                continue
+
             if self.evidence_select_method == 'interval':
-            # As long as there is no update, only the newly added variables are inferred each time
+                # As long as there is no update, only the newly added variables are inferred each time
                 add_list = [x for x in k_list if x not in inferenced_variables_id]
                 if len(add_list) > 0:
                     for var_id in add_list:
-                        # if var_id not in inferenced_variables_id:
                         self.inference_subgraph(var_id)
-                        # Hidden variables that have been inferred during each round of updates, no need to infer again because the parameters have not been updated.
                         inferenced_variables_id.add(var_id)
                 var = self.label(k_list)
                 gml_utils.write_labeled_var_to_evidence_interval(self.variables, self.features, var, self.support.evidence_interval)
@@ -358,28 +378,42 @@ class GML:
                 update_feature_set.clear()
                 self.labeled_variables_set.clear()
                 inferenced_variables_id.clear()
-            if len(self.poential_variables_set) >= self.top_m:  # If the number of hidden variables is less than topm, there is no need to select topm, and the labeled variables need to be removed from topm in real time
+            
+            # If the number of hidden variables is less than topm, there is no need to select topm, and the labeled variables need to be removed from topm in real time
+            if len(self.poential_variables_set) >= self.top_m:  
                 m_list = self.select_top_m_by_es(self.top_m)
             else:
+                m_list = list(self.poential_variables_set)
+
+            if var in m_list:
                 m_list.remove(var)
-            if len(self.poential_variables_set) >= self.top_k:  # If the number of hidden variables is less than topk, there is no need to select topk, and the labeled variables need to be removed from topk in real time
+
+             # If the number of hidden variables is less than topk, there is no need to select topk, and the labeled variables need to be removed from topk in real time
+            if len(self.poential_variables_set) >= self.top_k: 
                 k_list = self.select_top_k_by_entropy(m_list, self.top_k)
             else:
+                k_list = list(self.poential_variables_set)
+
+            if var in k_list:
                 k_list.remove(var)
+
+            if not k_list:
+                logging.warning("k_list is empty, no hidden variables to label")
+                continue
+
             if self.evidence_select_method == 'interval':
-            # As long as there is no update, only the newly added variables are inferred each time
+                # As long as there is no update, only the newly added variables are inferred each time
                 add_list = [x for x in k_list if x not in inferenced_variables_id]
                 if len(add_list) > 0:
                     for var_id in add_list:
-                        # if var_id not in inferenced_variables_id:
                         self.inference_subgraph(var_id)
-                        # Hidden variables that have been inferred during each round of updates, no need to infer again because the parameters have not been updated.
                         inferenced_variables_id.add(var_id)
                 var = self.label(k_list)
                 gml_utils.write_labeled_var_to_evidence_interval(self.variables, self.features, var, self.support.evidence_interval)
             else:
                 self.inference_subgraph(k_list)
                 var = self.label(k_list)
+            
             labeled_var += 1
             labeled_count += 1
             logging.info("label_num=" + str(labeled_count))
@@ -390,7 +424,12 @@ class GML:
         easys_true_label = list()
         hards_pred_label = list()
         hards_true_label = list()
+
         for var in self.variables:
+            if 'true_label' not in var:
+                logging.warning(f"Variable {var['var_id']} does not have 'true_label' key.")
+                continue
+
             if var['is_easy'] == True:
                 easys_true_label.append(var['true_label'])
                 easys_pred_label.append(var['label'])
@@ -401,33 +440,44 @@ class GML:
         all_true_label = easys_true_label + hards_true_label
         all_pred_label = easys_pred_label + hards_pred_label
 
+        if not all_true_label or not all_pred_label:
+            logging.warning("No labels available to calculate scores.")
+            return
+        
+        average_method = 'weighted'
+
         print("--------------------------------------------")
         print("total:")
         print("--------------------------------------------")
-        print("total precision_score: " + str(metrics.precision_score(all_true_label, all_pred_label)))
-        print("total recall_score: " + str(metrics.recall_score(all_true_label, all_pred_label)))
-        print("total f1_score: " + str(metrics.f1_score(all_true_label, all_pred_label)))
+        print("total precision_score: " + str(metrics.precision_score(all_true_label, all_pred_label, average=average_method)))
+        print("total recall_score: " + str(metrics.recall_score(all_true_label, all_pred_label, average=average_method)))
+        print("total f1_score: " + str(metrics.f1_score(all_true_label, all_pred_label, average=average_method)))
         print("--------------------------------------------")
         print("easys:")
         print("--------------------------------------------")
-        print("easys precision_score:" + str(metrics.precision_score(easys_true_label, easys_pred_label)))
-        print("easys recall_score:" + str(metrics.recall_score(easys_true_label, easys_pred_label)))
-        print("easys f1_score: " + str(metrics.f1_score(easys_true_label, easys_pred_label)))
+        print("easys precision_score:" + str(metrics.precision_score(easys_true_label, easys_pred_label, average=average_method)))
+        print("easys recall_score:" + str(metrics.recall_score(easys_true_label, easys_pred_label, average=average_method)))
+        print("easys f1_score: " + str(metrics.f1_score(easys_true_label, easys_pred_label, average=average_method)))
         print("--------------------------------------------")
         print("hards:")
         print("--------------------------------------------")
-        print("hards precision_score: " + str(metrics.precision_score(hards_true_label, hards_pred_label)))
-        print("hards recall_score: " + str(metrics.recall_score(hards_true_label, hards_pred_label)))
-        print("hards f1_score: " + str(metrics.f1_score(hards_true_label, hards_pred_label)))
+        print("hards precision_score: " + str(metrics.precision_score(hards_true_label, hards_pred_label, average=average_method)))
+        print("hards recall_score: " + str(metrics.recall_score(hards_true_label, hards_pred_label, average=average_method)))
+        print("hards f1_score: " + str(metrics.f1_score(hards_true_label, hards_pred_label, average=average_method)))
 
 if __name__ == '__main__':
-    warnings.filterwarnings('ignore')  # Filter out warning outputs
+    # warnings.filterwarnings('ignore')  # Filter out warning outputs
     begin_time = time.time()
     easys = helper.EasyInstanceLabeling.load_easy_instance_from_file('data/abtbuy_easys.csv')
     with open('data/abtbuy_variables.pkl', 'rb') as v:
         variables = pickle.load(v)
     with open('data/abtbuy_features.pkl', 'rb') as f:
         features = pickle.load(f)
+    # ensure all labels have a true label key 
+    for var in variables:
+        if 'true_label' not in var:
+            var['true_label'] = -1 # Might need to handle somehow
+
     EasyInstanceLabeling(variables,features,easys).label_easy_by_file()
     graph = GML(variables, features, evidential_support_method = 'regression',approximate_probability_method = 'interval', evidence_select_method = 'interval')
     graph.inference()

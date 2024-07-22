@@ -65,7 +65,7 @@ def create_fg(prior, accuracy, abstain, copies):
     variable = np.zeros(variables, Variable)
     factor = np.zeros(factors, Factor)
     fmap = np.zeros(edges, FactorToVar)
-    domain_mask = np.zeros(variables, np.bool)
+    domain_mask = np.zeros(variables, np.bool_)
 
     states = 2 * 3 ** n
     Z = np.zeros(states, np.float64)
