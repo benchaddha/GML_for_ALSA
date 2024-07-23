@@ -17,7 +17,7 @@ from scipy.stats import t
 from sklearn.linear_model import LinearRegression
 import logging
 import numpy as np
-import gml_utils
+import src.gml_utils as gml_utils
 
 
 

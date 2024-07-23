@@ -21,12 +21,12 @@ import time
 import warnings
 import pandas as pd
 from sklearn import metrics
-import gml_utils
+import src.gml_utils as gml_utils
 from evidential_support import EvidentialSupport
 from easy_instance_labeling import EasyInstanceLabeling
 from evidence_select import EvidenceSelect
 from approximate_probability_estimation import ApproximateProbabilityEstimation
-import helper
+import src.helper as helper
 
 class GML:
     '''
