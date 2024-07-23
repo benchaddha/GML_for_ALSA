@@ -1,7 +1,3 @@
-Here is a suggested README for the "GML_for_ALSA" project, based on the repository's contents and common practice style guidelines:
-
----
-
 # GML_for_ALSA
 
 Gradual Machine Learning for Aspect-level Sentiment Analysis
