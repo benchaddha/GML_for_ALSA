@@ -21,12 +21,12 @@ import time
 import warnings
 import pandas as pd
 from sklearn import metrics
-import src.gml_utils as gml_utils
+import gml_utils as gml_utils
 from evidential_support import EvidentialSupport
 from easy_instance_labeling import EasyInstanceLabeling
 from evidence_select import EvidenceSelect
 from approximate_probability_estimation import ApproximateProbabilityEstimation
-import src.helper as helper
+import helper as helper
 
 class GML:
     '''
@@ -468,10 +468,12 @@ class GML:
 if __name__ == '__main__':
     # warnings.filterwarnings('ignore')  # Filter out warning outputs
     begin_time = time.time()
-    easys = helper.EasyInstanceLabeling.load_easy_instance_from_file('data/abtbuy_easys.csv')
-    with open('data/abtbuy_variables.pkl', 'rb') as v:
+    easys = helper.EasyInstanceLabeling.load_easy_instance_from_file('data/test01_easys.csv') # replaced data/abtbuy_easys.csv
+    # with open('data/abtbuy_variables.pkl', 'rb') as v:
+    with open('data/test01_variables.pkl', 'rb') as v:
         variables = pickle.load(v)
-    with open('data/abtbuy_features.pkl', 'rb') as f:
+    # with open('data/abtbuy_features.pkl', 'rb') as f:
+    with open('data/test01_features.pkl', 'rb') as f:
         features = pickle.load(f)
     # ensure all labels have a true label key 
     for var in variables:

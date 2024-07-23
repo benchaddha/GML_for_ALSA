@@ -33,6 +33,10 @@ To run the GML for ALSA, execute the main script. Ensure you have the necessary 
 ```bash
 python gml.py
 ```
+Outputs are verbose so run the following to update output.txt with the terminal output in real time: 
+```bash
+python gml.py &> output.txt
+```
 
 ### Running Jupyter Notebook
 To explore the API documentation and examples, run the Jupyter Notebook:
